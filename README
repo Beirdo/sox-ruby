@@ -1,0 +1,11 @@
+= sox-ruby - libsox wrapper for Ruby
+
+== Summary
+
+sox-ruby is a LAME wrapper for Ruby.
+This will allow for sound file conversions and effects from Ruby.
+This is a Ruby extension library.
+
+== License
+
+See LICENSE.
