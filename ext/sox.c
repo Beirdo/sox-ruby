@@ -26,11 +26,13 @@ VALUE wrap_sox_effect_options(VALUE self, VALUE effp, VALUE argc, VALUE argv);
 VALUE wrap_sox_create_effects_chain(VALUE self, VALUE in_enc, VALUE out_enc);
 VALUE wrap_sox_delete_effects_chain(VALUE self, VALUE ecp);
 VALUE wrap_sox_add_effect(VALUE self, VALUE chain, VALUE effp, VALUE in, VALUE out);
+VALUE wrap_count(VALUE self);
 
 void Init_sox(void)
 {
     RubySox = rb_define_class("RubySox", rb_cObject);
     rb_define_singleton_method( RubySox, "new", wrap_new, 0);
+    rb_define_singleton_method( RubySox, "count", wrap_count, 0);
     rb_define_method( RubySox, "initialize", wrap_initialize, 0); 
     rb_define_method( RubySox, "sox_format_init", wrap_sox_format_init, 0); 
     rb_define_method( RubySox, "sox_format_quit", wrap_sox_format_quit, 0); 
@@ -56,6 +58,7 @@ VALUE wrap_new(VALUE class)
     count++;
     VALUE unitnum = Data_Wrap_Struct(RubySox, 0, destroy, &count);
 
+    rb_iv_set(class, "@count", INT2NUM(count));
     rb_obj_call_init(unitnum, 0, 0);
     return( unitnum );
 }
@@ -71,6 +74,11 @@ VALUE wrap_initialize(VALUE self)
     return( self );
 }
 
+VALUE wrap_count(VALUE class)
+{
+    return rb_iv_get(class, "@count");
+}
+
 static void destroy( void *p )
 {
     int *count;
@@ -80,6 +88,7 @@ static void destroy( void *p )
     if( *count == 0 ) {
         sox_format_quit();
     }
+    rb_iv_set(RubySox, "@count", INT2NUM(*count));
 }
 
 VALUE wrap_sox_format_init(VALUE self)
