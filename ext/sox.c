@@ -4,6 +4,7 @@
 static VALUE RubySox = Qnil;
 
 void Init_rubysox(void);
+sox_bool overwrite_callback(const char *filename);
 VALUE wrap_new(VALUE class);
 VALUE wrap_initialize(VALUE self);
 static void destroy(void *p);
@@ -48,15 +49,15 @@ void Init_rubysox(void)
     rb_define_method( RubySox, "sox_add_effect", wrap_sox_add_effect, 4); 
 }
 
-VALUE wrap_new(VALUE class);
+VALUE wrap_new(VALUE class)
 {
     static int count = 0;
 
     count++;
-    VALUE unitnum = Data_Wrap_Struct(RubySox, int, 0, destroy, &count);
+    VALUE unitnum = Data_Wrap_Struct(RubySox, 0, destroy, &count);
 
     rb_obj_call_init(unitnum, 0, 0);
-    return( unit );
+    return( unitnum );
 }
 
 VALUE wrap_initialize(VALUE self)
@@ -74,7 +75,7 @@ static void destroy( void *p )
 {
     int *count;
 
-    Data_Get_Struct(self, int, count);
+    count = (int *)p;
     *count--;
     if( *count == 0 ) {
         sox_format_quit();
@@ -121,6 +122,11 @@ VALUE wrap_sox_format_supports_encoding(VALUE self, VALUE path, VALUE filetype,
     return( INT2NUM(results) );
 }
 
+sox_bool overwrite_callback(const char *filename)
+{
+    return sox_false;
+}
+
 VALUE wrap_sox_open_write(VALUE self, VALUE path, VALUE signal, VALUE encoding,
                           VALUE filetype, VALUE oob)
 {
@@ -135,7 +141,8 @@ VALUE wrap_sox_open_write(VALUE self, VALUE path, VALUE signal, VALUE encoding,
     Data_Get_Struct(oob, sox_oob_t, c_oob);
     fmt = Data_Make_Struct(RubySox, sox_format_t *, 0, free, c_fmt);
     *c_fmt = sox_open_write( STR2CSTR(path), c_signal, c_encoding, 
-                             STR2CSTR(filetype), c_oob );
+                             STR2CSTR(filetype), c_oob,
+                             rb_block_given_p() ? overwrite_callback : NULL );
     return( fmt );
 }
 

@@ -1,2 +1,4 @@
 Makefile
 mkmf.log
+sox.o
+sox.so
