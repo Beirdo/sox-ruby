@@ -3,7 +3,7 @@
 
 static VALUE RubySox = Qnil;
 
-void Init_rubysox(void);
+void Init_sox(void);
 sox_bool overwrite_callback(const char *filename);
 VALUE wrap_new(VALUE class);
 VALUE wrap_initialize(VALUE self);
@@ -27,9 +27,9 @@ VALUE wrap_sox_create_effects_chain(VALUE self, VALUE in_enc, VALUE out_enc);
 VALUE wrap_sox_delete_effects_chain(VALUE self, VALUE ecp);
 VALUE wrap_sox_add_effect(VALUE self, VALUE chain, VALUE effp, VALUE in, VALUE out);
 
-void Init_rubysox(void)
+void Init_sox(void)
 {
-    RubySox = rb_define_module("RubySox");
+    RubySox = rb_define_class("RubySox", rb_cObject);
     rb_define_singleton_method( RubySox, "new", wrap_new, 0);
     rb_define_method( RubySox, "initialize", wrap_initialize, 0); 
     rb_define_method( RubySox, "sox_format_init", wrap_sox_format_init, 0); 
@@ -148,14 +148,56 @@ VALUE wrap_sox_open_write(VALUE self, VALUE path, VALUE signal, VALUE encoding,
 
 VALUE wrap_sox_read(VALUE self, VALUE ft, VALUE buf, VALUE len)
 {
+    return( Qnil );
 }
 
-VALUE wrap_sox_write(VALUE self, VALUE ft, VALUE buf, VALUE len);
-VALUE wrap_sox_close(VALUE self, VALUE ft);
-VALUE wrap_sox_seek(VALUE self, VALUE ft, VALUE offset, VALUE whence);
-VALUE wrap_sox_find_effect(VALUE self, VALUE name);
-VALUE wrap_sox_create_effect(VALUE self, VALUE eh);
-VALUE wrap_sox_effect_options(VALUE self, VALUE effp, VALUE argc, VALUE argv);
-VALUE wrap_sox_create_effects_chain(VALUE self, VALUE in_enc, VALUE out_enc);
-VALUE wrap_sox_delete_effects_chain(VALUE self, VALUE ecp);
-VALUE wrap_sox_add_effect(VALUE self, VALUE chain, VALUE effp, VALUE in, VALUE out);
+VALUE wrap_sox_write(VALUE self, VALUE ft, VALUE buf, VALUE len)
+{
+    return( Qnil );
+}
+
+VALUE wrap_sox_close(VALUE self, VALUE ft)
+{
+    return( Qnil );
+}
+
+VALUE wrap_sox_seek(VALUE self, VALUE ft, VALUE offset, VALUE whence)
+{
+    return( Qnil );
+}
+
+VALUE wrap_sox_find_effect(VALUE self, VALUE name)
+{
+    return( Qnil );
+}
+
+VALUE wrap_sox_create_effect(VALUE self, VALUE eh)
+{
+    return( Qnil );
+}
+
+VALUE wrap_sox_effect_options(VALUE self, VALUE effp, VALUE argc, VALUE argv)
+{
+    return( Qnil );
+}
+
+VALUE wrap_sox_create_effects_chain(VALUE self, VALUE in_enc, VALUE out_enc)
+{
+    return( Qnil );
+}
+
+VALUE wrap_sox_delete_effects_chain(VALUE self, VALUE ecp)
+{
+    return( Qnil );
+}
+
+VALUE wrap_sox_add_effect(VALUE self, VALUE chain, VALUE effp, VALUE in, VALUE out)
+{
+    return( Qnil );
+}
+
+
+/* 
+ * vim:ts=4:sw=4:ai:et:si:sts=4 
+ */
+
