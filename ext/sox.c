@@ -20,6 +20,7 @@ VALUE wrap_sox_read(VALUE self, VALUE ft, VALUE buf, VALUE len);
 VALUE wrap_sox_write(VALUE self, VALUE ft, VALUE buf, VALUE len);
 VALUE wrap_sox_close(VALUE self, VALUE ft);
 VALUE wrap_sox_seek(VALUE self, VALUE ft, VALUE offset, VALUE whence);
+VALUE wrap_sox_find_format(VALUE self, VALUE name, VALUE no_dev);
 VALUE wrap_sox_find_effect(VALUE self, VALUE name);
 VALUE wrap_sox_create_effect(VALUE self, VALUE eh);
 VALUE wrap_sox_effect_options(VALUE self, VALUE effp, VALUE argc, VALUE argv);
@@ -43,6 +44,7 @@ void Init_sox(void)
     rb_define_method( RubySox, "sox_write", wrap_sox_write, 3); 
     rb_define_method( RubySox, "sox_close", wrap_sox_close, 1); 
     rb_define_method( RubySox, "sox_seek", wrap_sox_seek, 3); 
+    rb_define_method( RubySox, "sox_find_format", wrap_sox_find_format, 2); 
     rb_define_method( RubySox, "sox_find_effect", wrap_sox_find_effect, 1); 
     rb_define_method( RubySox, "sox_create_effect", wrap_sox_create_effect, 1); 
     rb_define_method( RubySox, "sox_effect_options", wrap_sox_effect_options, 3); 
@@ -157,37 +159,98 @@ VALUE wrap_sox_open_write(VALUE self, VALUE path, VALUE signal, VALUE encoding,
 
 VALUE wrap_sox_read(VALUE self, VALUE ft, VALUE buf, VALUE len)
 {
-    return( Qnil );
+    size_t retval;
+    sox_format_t *c_ft;
+    sox_sample_t *c_buf;
+
+    Data_Get_Struct(ft, sox_format_t, c_ft);
+    Data_Get_Struct(buf, sox_sample_t, c_buf);
+    retval = sox_read(c_ft, c_buf, NUM2INT(len));
+
+    return( INT2NUM(retval) );
 }
 
 VALUE wrap_sox_write(VALUE self, VALUE ft, VALUE buf, VALUE len)
 {
-    return( Qnil );
+    size_t retval;
+    sox_format_t *c_ft;
+    sox_sample_t *c_buf;
+
+    Data_Get_Struct(ft, sox_format_t, c_ft);
+    Data_Get_Struct(buf, sox_sample_t, c_buf);
+    retval = sox_write(c_ft, c_buf, NUM2INT(len));
+
+    return( INT2NUM(retval) );
 }
 
 VALUE wrap_sox_close(VALUE self, VALUE ft)
 {
-    return( Qnil );
+    size_t retval;
+    sox_format_t *c_ft;
+
+    Data_Get_Struct(ft, sox_format_t, c_ft);
+    retval = sox_close(c_ft);
+
+    return( INT2NUM(retval) );
 }
 
 VALUE wrap_sox_seek(VALUE self, VALUE ft, VALUE offset, VALUE whence)
 {
-    return( Qnil );
+    size_t retval;
+    sox_format_t *c_ft;
+
+    Data_Get_Struct(ft, sox_format_t, c_ft);
+    retval = sox_seek(c_ft, NUM2LONG(offset), NUM2INT(whence));
+
+    return( INT2NUM(retval) );
+}
+
+VALUE wrap_sox_find_format(VALUE self, VALUE name, VALUE no_dev)
+{
+    sox_format_handler_t const *retval;
+    VALUE retruby;
+
+    retval = sox_find_format( (char const *)STR2CSTR(name), NUM2INT(no_dev) );
+    retruby = Data_Wrap_Struct(RubySox, 0, free, (sox_format_handler_t *)retval);
+
+    return( retruby );
 }
 
 VALUE wrap_sox_find_effect(VALUE self, VALUE name)
 {
-    return( Qnil );
+    sox_effect_handler_t const *retval;
+    VALUE retruby;
+
+    retval = sox_find_effect( (char const *)STR2CSTR(name) );
+    retruby = Data_Wrap_Struct(RubySox, 0, free, (sox_effect_handler_t *)retval);
+
+    return( retruby );
 }
 
 VALUE wrap_sox_create_effect(VALUE self, VALUE eh)
 {
-    return( Qnil );
+    sox_effect_handler_t *c_eh;
+    sox_effect_t *retval;
+    VALUE retruby;
+
+    Data_Get_Struct(eh, sox_effect_handler_t, c_eh);
+    retval = sox_create_effect( c_eh );
+    retruby = Data_Wrap_Struct(RubySox, 0, free, retval);
+
+    return( retruby );
 }
 
 VALUE wrap_sox_effect_options(VALUE self, VALUE effp, VALUE argc, VALUE argv)
 {
-    return( Qnil );
+    sox_effect_t *c_effp;
+    char **c_argv;
+    int retval;
+
+    Data_Get_Struct(effp, sox_effect_t, c_effp);
+    Data_Get_Struct(argv, char *, c_argv);
+    retval = sox_effect_options( c_effp, NUM2INT(argc), c_argv );
+
+    return( INT2NUM(retval) );
 }
 
 VALUE wrap_sox_create_effects_chain(VALUE self, VALUE in_enc, VALUE out_enc)
