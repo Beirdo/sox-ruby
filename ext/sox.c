@@ -255,17 +255,42 @@ VALUE wrap_sox_effect_options(VALUE self, VALUE effp, VALUE argc, VALUE argv)
 
 VALUE wrap_sox_create_effects_chain(VALUE self, VALUE in_enc, VALUE out_enc)
 {
-    return( Qnil );
+    sox_encodinginfo_t *c_in_enc, *c_out_enc;
+    sox_effects_chain_t *retval;
+    VALUE retruby;
+
+    Data_Get_Struct(in_enc, sox_encodinginfo_t, c_in_enc);
+    Data_Get_Struct(out_enc, sox_encodinginfo_t, c_out_enc);
+    retval = sox_create_effects_chain( c_in_enc, c_out_enc );
+    retruby = Data_Wrap_Struct(RubySox, 0, free, retval);
+
+    return( retruby );
 }
 
 VALUE wrap_sox_delete_effects_chain(VALUE self, VALUE ecp)
 {
+    sox_effects_chain_t *c_ecp;
+
+    Data_Get_Struct(ecp, sox_effects_chain_t, c_ecp);
+    sox_delete_effects_chain( c_ecp );
+
     return( Qnil );
 }
 
 VALUE wrap_sox_add_effect(VALUE self, VALUE chain, VALUE effp, VALUE in, VALUE out)
 {
-    return( Qnil );
+    sox_effects_chain_t *c_chain;
+    sox_effect_t *c_effp;
+    sox_signalinfo_t *c_in, *c_out;
+    int retval;
+
+    Data_Get_Struct(chain, sox_effects_chain_t, c_chain);
+    Data_Get_Struct(effp, sox_effect_t, c_effp);
+    Data_Get_Struct(in, sox_signalinfo_t, c_in);
+    Data_Get_Struct(out, sox_signalinfo_t, c_out);
+    retval = sox_add_effect( c_chain, c_effp, c_in, c_out );
+
+    return( INT2NUM(retval) );
 }
 
 
